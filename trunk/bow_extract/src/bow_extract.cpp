@@ -53,7 +53,7 @@ public:
 
     // SURF Method
 
-    int minHessian = 400;
+    int minHessian = 1000;
     detector = new cv::SurfFeatureDetector(minHessian);
     extractor = new cv::SurfDescriptorExtractor();
     matcher = new cv::FlannBasedMatcher();
@@ -100,14 +100,14 @@ public:
     detector->detect(cv_ptr->image,keypoints);
     extractor->compute(cv_ptr->image,keypoints,descriptors);
     matcher->match(descriptors,codebook,matches);
-
-    cv::imshow(WINDOW, cv_ptr->image);
-    cv::waitKey(3);
     
     // output to message
 
     bow_extract::cvKeypointVec cvKeyVec;
     for (unsigned int i = 0; i < keypoints.size(); i++) {
+      
+      keypoints[i].class_id = matches[i].trainIdx;
+
       bow_extract::cvKeypoint cvKey;
       cvKey.x = keypoints[i].pt.x;
       cvKey.y = keypoints[i].pt.y;
@@ -116,13 +116,21 @@ public:
       cvKey.response = keypoints[i].response;
       cvKey.octave = keypoints[i].octave;
       //cvKey.class_id = 0;
-      cvKey.class_id = matches[i].trainIdx;
+      cvKey.class_id = keypoints[i].class_id;
       cvKeyVec.keypoints.push_back(cvKey);
     }
+
+    cv::Mat img_keypoints;
+    drawKeypoints(cv_ptr->image,keypoints,img_keypoints,cv::Scalar(255,0,0),cv::DrawMatchesFlags::DEFAULT);
+
+    cv::imshow(WINDOW, img_keypoints);
+    cv::waitKey(3);
+
 
     pub_.publish(cvKeyVec);
     
     descriptors.release();
+    img_keypoints.release();
 
   }
 };
