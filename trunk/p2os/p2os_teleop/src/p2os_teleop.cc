@@ -66,7 +66,7 @@ class TeleopBase
   int deadman_button, run_button;
   bool deadman_no_publish_;
   bool deadman_;
-	bool running_;
+        bool running_;
 
   ros::Time last_recieved_joy_message_time_;
   ros::Duration joy_msg_timeout_;
@@ -98,18 +98,18 @@ class TeleopBase
         n_.param("deadman_button", deadman_button, 0);
         n_.param("run_button", run_button, 0);
 
-	double joy_msg_timeout;
+        double joy_msg_timeout;
         n_.param("joy_msg_timeout", joy_msg_timeout, -1.0); //default to no timeout
-	if (joy_msg_timeout <= 0)
-	  {
-	    joy_msg_timeout_ = ros::Duration().fromSec(9999999);//DURATION_MAX;
-	    ROS_DEBUG("joy_msg_timeout <= 0 -> no timeout");
-	  }
-	else
-	  {
-	    joy_msg_timeout_.fromSec(joy_msg_timeout);
-	    ROS_DEBUG("joy_msg_timeout: %.3f", joy_msg_timeout_.toSec());
-	  }
+        if (joy_msg_timeout <= 0)
+          {
+            joy_msg_timeout_ = ros::Duration().fromSec(9999999);//DURATION_MAX;
+            ROS_DEBUG("joy_msg_timeout <= 0 -> no timeout");
+          }
+        else
+          {
+            joy_msg_timeout_.fromSec(joy_msg_timeout);
+            ROS_DEBUG("joy_msg_timeout: %.3f", joy_msg_timeout_.toSec());
+          }
 
         ROS_DEBUG("max_vx: %.3f m/s\n", max_vx);
         ROS_DEBUG("max_vy: %.3f m/s\n", max_vy);
@@ -131,30 +131,30 @@ class TeleopBase
         vel_pub_ = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
         passthrough_sub_ = n_.subscribe( "des_vel", 10, &TeleopBase::passthrough_cb, this );
         joy_sub_ = n_.subscribe("joy", 10, &TeleopBase::joy_cb, this);
-	//joy_sub_ = n_.subscribe("joy", 10, &sensor_msgs::Joy, this);
-	//joy_sub_ = n_.subscribe("joy", 10, joy_cb);
-	}
+        //joy_sub_ = n_.subscribe("joy", 10, &sensor_msgs::Joy, this);
+        //joy_sub_ = n_.subscribe("joy", 10, joy_cb);
+        }
   
-	~TeleopBase() {  }
+        ~TeleopBase() {  }
 
-	void passthrough_cb( const geometry_msgs::TwistConstPtr& pass_msg )
-	{
-		//ROS_INFO( "passthrough_cmd: [%f,%f]", passthrough_cmd.linear.x, passthrough_cmd.angular.z );
-		passthrough_cmd = *pass_msg;
-	}
+        void passthrough_cb( const geometry_msgs::TwistConstPtr& pass_msg )
+        {
+                //ROS_INFO( "passthrough_cmd: [%f,%f]", passthrough_cmd.linear.x, passthrough_cmd.angular.z );
+                passthrough_cmd = *pass_msg;
+        }
 
-	//void joy_cb(const joy::Joy::ConstPtr& joy_msg)
-	
-	void joy_cb(const sensor_msgs::Joy::ConstPtr& joy_msg)
-	{
-        	//ROS_INFO( "joy_cb: [%f,%f]", passthrough_cmd.linear.x, passthrough_cmd.angular.z );
+        //void joy_cb(const joy::Joy::ConstPtr& joy_msg)
+        
+        void joy_cb(const sensor_msgs::Joy::ConstPtr& joy_msg)
+        {
+                //ROS_INFO( "joy_cb: [%f,%f]", passthrough_cmd.linear.x, passthrough_cmd.angular.z );
     deadman_ = (((unsigned int)deadman_button < joy_msg->get_buttons_size()) && joy_msg->buttons[deadman_button]);
 
     if (!deadman_)
-    	return;
-		
-		//Record this message reciept
-		last_recieved_joy_message_time_ = ros::Time::now();
+        return;
+                
+                //Record this message reciept
+                last_recieved_joy_message_time_ = ros::Time::now();
 
     // Base
     running_ = (((unsigned int)run_button < joy_msg->get_buttons_size()) && joy_msg->buttons[run_button]);
@@ -163,11 +163,11 @@ class TeleopBase
     double vw = running_ ? max_vw_run : max_vw;
 
     if((axis_vx >= 0) && (((unsigned int)axis_vx) < joy_msg->get_axes_size()))
-    	req_vx = joy_msg->axes[axis_vx] * vx;
+        req_vx = joy_msg->axes[axis_vx] * vx;
     else
       req_vx = 0.0;
     if((axis_vy >= 0) && (((unsigned int)axis_vy) < joy_msg->get_axes_size()))
-    	req_vy = joy_msg->axes[axis_vy] * vy;
+        req_vy = joy_msg->axes[axis_vy] * vy;
     else
       req_vy = 0.0;
     if((axis_vw >= 0) && (((unsigned int)axis_vw) < joy_msg->get_axes_size()))
@@ -180,9 +180,9 @@ class TeleopBase
   void send_cmd_vel()
   {
     if(deadman_ &&
-		  last_recieved_joy_message_time_ + joy_msg_timeout_ > ros::Time::now() && running_ )
+                  last_recieved_joy_message_time_ + joy_msg_timeout_ > ros::Time::now() && running_ )
     {
-    	cmd.linear.x = req_vx;
+        cmd.linear.x = req_vx;
       cmd.linear.y = req_vy;
       cmd.angular.z = req_vw;
       vel_pub_.publish(cmd);
@@ -205,7 +205,7 @@ class TeleopBase
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "teleop_base");
-	ros::NodeHandle nh;
+        ros::NodeHandle nh;
   const char* opt_no_publish    = "--deadman_no_publish";
   
   bool no_publish = false;
