@@ -1,0 +1,18 @@
+<package>
+  <description brief="global_plan_only">
+
+     global_plan_only
+
+  </description>
+  <author>Will Maddern</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/global_plan_only</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="navfn"/>
+  <depend package="costmap_2d"/>
+
+</package>
+
+
