@@ -1,0 +1,15 @@
+<package>
+  <description brief="fine_grain_amcl">
+
+     fine_grain_amcl
+
+  </description>
+  <author>liz</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fine_grain_amcl</url>
+  <depend package="tf"/>
+
+</package>
+
+
