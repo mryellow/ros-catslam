@@ -47,6 +47,8 @@ class ExtractImages
 {
 private:
   image_transport::Subscriber sub_;
+  
+  std::vector<int> outputFileParams;
 
   sensor_msgs::ImageConstPtr last_msg_;
   sensor_msgs::CvBridge img_bridge_;
@@ -70,13 +72,16 @@ public:
     ros::NodeHandle local_nh("~");
 
     std::string format_string;
-    local_nh.param("filename_format", format_string, std::string("frame%04i.jpg"));
+    local_nh.param("filename_format", format_string, std::string("frame%04i.png"));
     filename_format_.parse(format_string);
 
     local_nh.param("sec_per_frame", sec_per_frame_, 0.1);
 
     image_transport::ImageTransport it(nh);
     sub_ = it.subscribe(topic, 1, &ExtractImages::image_cb, this, transport);
+    
+    outputFileParams.push_back(CV_IMWRITE_PNG_COMPRESSION);
+	outputFileParams.push_back(0);
 
 #if defined(_VIDEO)
     video_writer = 0;
@@ -101,8 +106,8 @@ public:
     if (msg->encoding.find("bayer") != std::string::npos)
       boost::const_pointer_cast<sensor_msgs::Image>(msg)->encoding = "mono8";
 
-    if (!img_bridge_.fromImage(*msg, "bgr8"))
-      ROS_ERROR("Unable to convert %s image to bgr8", msg->encoding.c_str());
+    if (!img_bridge_.fromImage(*msg, "mono16"))
+      ROS_ERROR("Unable to convert %s image to mono16", msg->encoding.c_str());
 
     double delay = ros::Time::now().toSec()-_time;
     if(delay >= sec_per_frame_)
@@ -110,11 +115,14 @@ public:
       _time = ros::Time::now().toSec();
 
       IplImage *image = img_bridge_.toIpl();
+      cv::Mat image_mat(image);
+      
       if (image) {
         std::string filename = (filename_format_ % count_).str();
 
 #if !defined(_VIDEO)
-        cvSaveImage(filename.c_str(), image);
+		cv::imwrite(filename.c_str(), image_mat, outputFileParams);
+        //cvSaveImage(filename.c_str(), image);
 #else
         if(!video_writer)
         {
@@ -149,3 +157,4 @@ int main(int argc, char **argv)
 
   return 0;
 }
+
